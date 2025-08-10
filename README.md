@@ -177,17 +177,17 @@
 <div class="store" id="store">
   <div class="item">
     <h2>Vector</h2>
-    <p>High-quality service/product description here.</p>
+    <p>High-Quallity undetected external, made perfectly for major games such as fallen survival. </p>
     <button class="buy-btn" onclick="window.location.href='https://www.paypal.com/checkoutnow?placeholder'">Buy Now</button>
   </div>
   <div class="item">
     <h2>Matrix</h2>
-    <p>High-quality service/product description here.</p>
+    <p>Full Undetected external so many working features for all games.</p>
     <button class="buy-btn" onclick="window.location.href='https://www.paypal.com/checkoutnow?placeholder'">Buy Now</button>
   </div>
   <div class="item">
     <h2>Fallen Account Legit</h2>
-    <p>High-quality service/product description here.</p>
+    <p>High-quality fully legit fallen alt accounts.</p>
     <button class="buy-btn" onclick="window.location.href='https://www.paypal.com/checkoutnow?placeholder'">Buy Now</button>
   </div>
 </div>
