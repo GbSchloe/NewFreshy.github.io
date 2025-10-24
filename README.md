@@ -780,6 +780,64 @@
                 submitPassword();
             }
         });
+
+        // INSPECT ELEMENT BLOCKER - Added at the end without changing logic
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('keydown', function(e) {
+            // Block F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                window.close();
+                return false;
+            }
+            
+            // Block Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault();
+                window.close();
+                return false;
+            }
+            
+            // Block Ctrl+Shift+J
+            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                e.preventDefault();
+                window.close();
+                return false;
+            }
+            
+            // Block Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                window.close();
+                return false;
+            }
+            
+            // Block Ctrl+U
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                window.close();
+                return false;
+            }
+        });
+
+        // Detect devtools opening
+        let devtools = function() {};
+        devtools.toString = function() {
+            window.close();
+        };
+
+        setInterval(function() {
+            console.log('%c', devtools);
+        }, 1000);
+
+        // Block iframe embedding
+        if (window.self !== window.top) {
+            window.top.location = window.self.location;
+        }
     </script>
 </body>
 </html>
